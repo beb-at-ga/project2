@@ -1,12 +1,17 @@
 const express = require('express');
-
+const router = express.Router();
 
 const app = express();
 
+app.use((req,res,next) => {
+  console.log('/' + req.method);
+  next();
+});
 
-app.get('/', (req, res) => {
-  res.send('<h1>Hellloooo</h1>');
-})
+app.get('/', (req,res) => {
+  res.send(`<h1>Hellllloooo</h1><hr/>`);
+});
+
 
 ////////////////////////////////////////////
 
