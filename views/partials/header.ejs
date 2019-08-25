@@ -1,0 +1,25 @@
+<nav class="transparent">
+  <ul>
+    <li>
+      <a href="/" class="teal-text text-darken-2">Home</a>
+    </li>
+    <% if (customer) { %>
+    <% if (customer.firstname) { %>
+    <li>
+      <a href="/profile" class="teal-text text-darken-2">Welcome Back, <%= customer.firstname %></a>
+    </li>
+    <% } else { %>
+      <li>
+      <a href="/profile" class="teal-text text-darken-2">Profile</a>
+    </li>
+    <li>
+      <a href="/auth/signout" class="teal-text text-darken-2">Sign Out</a>
+    </li>
+    <% }; %>
+    <% } else { %>
+    <li>
+      <a href="/auth" class="teal-text text-darken-2">Sign In</a>
+    </li>
+    <% }; %>
+  </ul>
+</nav>

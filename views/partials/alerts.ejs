@@ -1,0 +1,23 @@
+<div>
+  <div>
+    <% if (alerts && alerts.error) { %>
+    <div>
+      <h2>Error:</h2>
+      <hr>
+      <% alerts.error.forEach(msg => { %>
+      <p><%= msg %></p>
+      <% }) %>
+    </div>
+    <% } %>
+
+    <% if (alerts && alerts.success) { %>
+    <div>
+      <h2>Success:</h2>
+      <hr>
+      <% alerts.success.forEach(msg => { %>
+      <p><%= msg %></p>
+      <% }) %>
+    </div>
+    <% } %>
+  </div>
+</div>
