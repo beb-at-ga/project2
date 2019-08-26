@@ -1,1 +1,22 @@
-<h1>Yo! This is your profile page, <%= customer.email %></h1>
+<h2>Profile page for <%= customer.email %></h2>
+
+<!-- <body onload="getLocation()"></body> -->
+<div>
+  <button onclick="getLocation()">Find Nearest</button>
+</div>
+
+<input type="text" name="firstname" placeholder="First name" form="profileform">
+
+<select id="preferred_route" name="preferred_route" form="profileform">
+  <% routes.forEach(r => { %>
+  <option value="<%= r.RouteID %>"><%= r.Description %></option>
+  <% }) %>
+</select>
+
+<form id="profileform" method="POST" action="/profile">
+  <button type="submit">Save Preferred Route</button>
+</form>
+
+<p id="location"></p>
+
+

@@ -3,6 +3,7 @@ const passport = require('passport');
 const localStrategy = require('passport-local').Strategy;
 const db = require('../models');
 
+
 // provide serialize/deserialize fn 
 // allow passort to store user by id alone (serialize) and
 // lookup a user's full information from the id (deserialization).
