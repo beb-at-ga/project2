@@ -36,6 +36,7 @@ console.log('Helloooo');
 
 
 let x = document.getElementById("location");
+let preferredRouteSelector = getElementById("preferred_route");
 
 function getLocation() {
   if (navigator.geolocation) {
@@ -51,4 +52,6 @@ function showPosition(position) {
   //   lat: position.coords.latitude,
   //   lng: position.coords.longitude
   // });
+
+
 }

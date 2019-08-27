@@ -50,4 +50,3 @@
 - sequelize model:create --name customer --attributes "email:string, firstname:string, lastname:string, password:string"
 - sequelize db:migrate
 
-

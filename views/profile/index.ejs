@@ -1,15 +1,23 @@
-<h2>Profile page for <%= customer.email %></h2>
+<% if (customer.firstname) { %>
+  <h2>Hi, <%= customer.firstname %></h2>
+  <% } else { %>
+  <h2>Hi, <%= customer.email %></h2>
+<% } %>
 
 <!-- <body onload="getLocation()"></body> -->
 <div>
   <button onclick="getLocation()">Find Nearest</button>
 </div>
 
-<input type="text" name="firstname" placeholder="First name" form="profileform">
+<input type="text" name="firstname" value="<%= customer.firstname %>" placeholder="First Name" form="profileform">
 
 <select id="preferred_route" name="preferred_route" form="profileform">
   <% routes.forEach(r => { %>
-  <option value="<%= r.RouteID %>"><%= r.Description %></option>
+    <% if (r.RouteID === customer.preferredrouteid) { %>  
+    <option value="<%= r.RouteID %>" selected><%= r.Description %></option>
+    <% } else { %>
+    <option value="<%= r.RouteID %>"><%= r.Description %></option>
+    <% } %>
   <% }) %>
 </select>
 
@@ -19,4 +27,31 @@
 
 <p id="location"></p>
 
+<p>Best walking time from current location:</p>
+<p id="best_time"></p>
 
+<p>TODO: Add "method/walking, method/bicycling".</p>
+<p>TODO: Add "buffer time".</p>
+<p>TODO: Add schedule "tracking", an array of schedules to watch.</p>
+
+
+
+<!-- 
+<div id='map'></div>
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1IjoiYmViLSIsImEiOiJjanpsbGpuZjMwd2ttM2JrNmtyNTVldGM0In0.Tmu9yv3-2cWJFxiq87xFPQ';
+  var map = new mapboxgl.Map({
+    container: 'map', // container id
+    style: 'mapbox://styles/mapbox/streets-v11',
+    center: [-96, 37.8], // starting position
+    zoom: 3 // starting zoom
+  });
+
+  // Add geolocate control to the map.
+  map.addControl(new mapboxgl.GeolocateControl({
+    positionOptions: {
+      enableHighAccuracy: true
+    },
+    trackUserLocation: true
+  }));
+</script> -->

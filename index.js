@@ -9,11 +9,15 @@ const pgSession = require('connect-pg-simple')(session)
 const sessionPool = require('pg').Pool
 // const uuid = require('uuid/v4');
 const fs = require("fs");
-const pgConfig  = JSON.parse(fs.readFileSync('./config/config.json'));
+const pgConfig = JSON.parse(fs.readFileSync('./config/config.json'));
 
 const app = express();
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
+
+
+// const http = require('http').Server(app);
+// const io = require('socket.io')(http);
+// app.set('socketio', io);
+
 
 const sessionConfig = {
   store: new pgSession({
@@ -75,19 +79,25 @@ app.use('/auth', require('./controllers/auth'));
 app.use('/profile', require('./controllers/profile'));
 
 
-io.on('connection', (socket) => {
-  console.log('A client has connected.');
 
-  socket.on("chat message", (msg) => {
-    console.log(msg)
-    io.emit('chat message', msg);
-  });
+// app.get('/socket.io', (req, res) => {
+//   // let io = req.app.get('socketio');
+//   // io.emit('hi!');  
 
-  socket.on("disconnect", () => {
-    console.log('A client has disconnected.');
-  });
+//   io.on('connection', (socket) => {
+//     console.log('A client has connected.');
 
-});
+//     socket.on("chat message", (msg) => {
+//       console.log(msg)
+//       io.emit('chat message', msg);
+//     });
+
+//     socket.on("disconnect", () => {
+//       console.log('A client has disconnected.');
+//     });
+
+//   });
+// })
 
 
 
@@ -103,7 +113,6 @@ try {
 } catch (err) {
   console.log(`~~~~~~~ Error starting express: ${err}`);
 }
-
 
 
 

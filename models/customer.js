@@ -22,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
           msg: 'Your password must be between 6 and 32 characters in length.'
         }
       }
-    }
+    },
+    preferredrouteid: DataTypes.INTEGER
   }, {
     hooks: {
       beforeCreate: (pendingUser) => {
