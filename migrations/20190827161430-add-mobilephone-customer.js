@@ -1,16 +1,17 @@
 'use strict';
+
 module.exports = {
   up: (queryInterface, Sequelize) => {
 
-
     return queryInterface.addColumn(
       'customers',
-      'preferredrouteid',
-     Sequelize.INTEGER
+      'mobilephone',
+     Sequelize.STRING
     );
-
+    
   },
   down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable('customers');
+    console.log('mobilephone column not removed from customers table.')
   }
 };
+

@@ -23,7 +23,9 @@ module.exports = (sequelize, DataTypes) => {
         }
       }
     },
-    preferredrouteid: DataTypes.INTEGER
+    preferredrouteid: DataTypes.INTEGER,
+    mobilephone: DataTypes.STRING,
+    preferredDepartingTerminalID: DataTypes.INTEGER
   }, {
     hooks: {
       beforeCreate: (pendingUser) => {
@@ -39,6 +41,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   customer.associate = function(models) {
     // associations can be defined here
+    models.customer.hasMany(models.watchedRoute)
   };
 
   // custom function: validPassword(password)

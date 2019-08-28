@@ -1,8 +1,27 @@
 console.log('Helloooo');
 
+
+let routeMatrix = [{
+    RouteID: 5,
+    Description: 'Seattle / Bainbridge Island',
+    DepartingTerminalID: 7,
+    DepartingTerminalName: 'Seattle',
+    ArrivingTerminalID: 3,
+    ArrivingTerminalName: 'Bainbridge Island'
+  },
+  {
+    RouteID: 5,
+    Description: 'Seattle / Bainbridge Island',
+    DepartingTerminalID: 3,
+    DepartingTerminalName: 'Bainbridge Island',
+    ArrivingTerminalID: 7,
+    ArrivingTerminalName: 'Seattle'
+  }
+]
+
+
 // const socket = io();
 // const chatFormEl = document.getElementById('chat-form');
-
 
 // chatFormEl.addEventListener('submit', (e) => {
 //   e.preventDefault();
@@ -26,7 +45,6 @@ console.log('Helloooo');
 // })
 
 
-
 // document.addEventListener('DOMContentLoaded', () => {
 //   var elems = document.querySelectorAll('.modal');
 //   var instances = M.Modal.init(elems, {
@@ -34,24 +52,48 @@ console.log('Helloooo');
 //   });
 // });
 
+let loc = document.getElementById('location');
+// let preferred_terminal_on_route = document.getElementById('preferred_terminal_on_route'); 
+// let preferred_departure = document.getElementById('preferred_departure'); 
 
-let x = document.getElementById("location");
-let preferredRouteSelector = getElementById("preferred_route");
+
+
+document.getElementById('preferredrouteid').addEventListener('change', (event) => {
+  // console.log(event.target.value);
+
+  console.log(event.target.value);
+
+});
+
 
 function getLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showPosition);
   } else {
-    x.innerHTML = "Location request not supported. Your browser blows. You really should updgrade. Not just for the better features but for the vastly improved security.";
+    loc.innerHTML = 'Location request not supported. Your browser blows. You really should updgrade. Not just for the better features but for the vastly improved security.';
   }
 }
 // To remove after debugging.
 function showPosition(position) {
-  x.innerHTML = "Location: " + position.coords.latitude + " / " + position.coords.longitude;
+  loc.innerHTML = "Location: " + position.coords.latitude + " / " + position.coords.longitude;
   // socket.emit('coords', {
   //   lat: position.coords.latitude,
   //   lng: position.coords.longitude
   // });
-
-
 }
+
+
+
+
+// document.getElementById('preferred_route').addEventListener('change', (event) => {
+//   axios({
+//     url: 'http://localhost:3000/',
+//     method: 'get'
+//   })
+//   .then(results => {
+//     console.log(results);
+//   })
+//   .catch(err => {
+//     console.log(err);
+//   })  
+// });

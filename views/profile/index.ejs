@@ -1,42 +1,66 @@
 <% if (customer.firstname) { %>
-  <h2>Hi, <%= customer.firstname %></h2>
-  <% } else { %>
-  <h2>Hi, <%= customer.email %></h2>
+<h2>Hi, <%= customer.firstname %></h2>
+<% } else { %>
+<h2>Hi, <%= customer.email %></h2>
 <% } %>
 
 <!-- <body onload="getLocation()"></body> -->
 <div>
   <button onclick="getLocation()">Find Nearest</button>
 </div>
-
-<input type="text" name="firstname" value="<%= customer.firstname %>" placeholder="First Name" form="profileform">
-
-<select id="preferred_route" name="preferred_route" form="profileform">
-  <% routes.forEach(r => { %>
-    <% if (r.RouteID === customer.preferredrouteid) { %>  
-    <option value="<%= r.RouteID %>" selected><%= r.Description %></option>
-    <% } else { %>
-    <option value="<%= r.RouteID %>"><%= r.Description %></option>
-    <% } %>
-  <% }) %>
-</select>
-
-<form id="profileform" method="POST" action="/profile">
-  <button type="submit">Save Preferred Route</button>
-</form>
-
 <p id="location"></p>
+<hr />
 
+<label for="firstname">First Name</label>:
+<input id="firstname" type="text" name="firstname" value="<%= customer.firstname %>" placeholder="First Name" form="profileform">
+
+<div>
+  Watch Route: 
+  <select id="preferredrouteid" name="preferredrouteid" form="profileform">
+    <% routeMatrix.forEach(rm => { %>
+      <% if (rm.routeId === customer.preferredrouteid) { %>
+        <option value='{"routeId": <%= rm.routeId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}' selected><%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
+      <% } else { %>
+        <option value='{"routeId": <%= rm.routeId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}'><%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
+      <% } %>
+    <% }) %>
+  </select> 
+</div>    
+
+<div>
+  <form id="profileform" method="POST" action="/profile">
+    <button type="submit">Add Route</button>
+  </form>
+</div>
+
+<hr />
+
+<div>
+  <p>Currently Watched Routes</p>
+
+
+
+</div>
+
+
+<hr />
+
+<!-- 
 <p>Best walking time from current location:</p>
 <p id="best_time"></p>
 
-<p>TODO: Add "method/walking, method/bicycling".</p>
-<p>TODO: Add "buffer time".</p>
-<p>TODO: Add schedule "tracking", an array of schedules to watch.</p>
-
+ -->
 
 
 <!-- 
+<p>TODO: Add "method/walking, method/bicycling".</p>
+<p>TODO: Add "buffer time".</p>
+<p>TODO: Add schedule "tracking", an array of schedules to watch.</p>
+<hr />
+ -->
+
+
+    <!-- 
 <div id='map'></div>
 <script>
   mapboxgl.accessToken = 'pk.eyJ1IjoiYmViLSIsImEiOiJjanpsbGpuZjMwd2ttM2JrNmtyNTVldGM0In0.Tmu9yv3-2cWJFxiq87xFPQ';

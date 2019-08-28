@@ -50,3 +50,17 @@
 - sequelize model:create --name customer --attributes "email:string, firstname:string, lastname:string, password:string"
 - sequelize db:migrate
 
+
+
+
+
+- sequelize model:create --name watchedRoute --attributes "customerId:integer, routeId:integer, departingTerminalId:integer, arrivingTerminalId:integer"
+
+
+- sequelize model:create --name routesWithTerminals --attributes "routeId:integer, description:string, departingTerminalId:integer, departingTerminalName:string, arrivingTerminalId:integer, arrivingTerminalName:string"
+
+
+- sequelize model:create --name customersRouteCombos --attributes "customerId:integer, routeComboId:integer"
+
+
+

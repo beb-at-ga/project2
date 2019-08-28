@@ -10,8 +10,10 @@ const sessionPool = require('pg').Pool
 // const uuid = require('uuid/v4');
 const fs = require("fs");
 const pgConfig = JSON.parse(fs.readFileSync('./config/config.json'));
+const helmet = require('helmet');
 
 const app = express();
+app.use(helmet());
 
 
 // const http = require('http').Server(app);
