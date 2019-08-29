@@ -1,0 +1,16 @@
+<h1>You found the route view... good for you.</h1>
+
+<!-- <h1><%= moment("/Date(1561273200000-0700)/") %></h1> -->
+
+<form method="POST" action="/profile/addJourneys">
+
+
+  <select id="journyid" name="journeyid">
+    <% journs.forEach(j => { %>
+        <option value='<%= j.JourneyID %>'><%= j.TerminalID %><%= moment(j.TerminalTimes[0].Time).format("hh:mm A") %></option>
+    <% }) %>
+  </select> 
+
+  <button type="SUBMIT">Watch Journys</button>
+</form>
+

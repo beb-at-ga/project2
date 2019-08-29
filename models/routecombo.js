@@ -6,7 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     departingTerminalId: DataTypes.INTEGER,
     departingTerminalName: DataTypes.STRING,
     arrivingTerminalId: DataTypes.INTEGER,
-    arrivingTerminalName: DataTypes.STRING
+    arrivingTerminalName: DataTypes.STRING,
+    scheduledRouteId: DataTypes.INTEGER
   }, {});
   routeCombo.associate = function(models) {
     // associations can be defined here

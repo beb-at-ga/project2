@@ -64,3 +64,4 @@
 
 
 
+- sequelize model:create --name watchedJourney --attributes "customerId:integer, journyId:integer"

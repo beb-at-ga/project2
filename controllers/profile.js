@@ -27,7 +27,6 @@ let GetProfileOptions = function (customer) {
   this.customer = customer;
 
 
-
   this.getRouteCombos = function (done) {
     // Make Customer to Route and Teminals Many to Many through the watched Route Table.
     // console.log(`~~~~ In getRouteCombos.`)
@@ -40,6 +39,23 @@ let GetProfileOptions = function (customer) {
       })
   }
 
+
+  this.getWatchedJourns = function (done) {
+    db.customer.findOne({
+      where: {
+        id: customer.id
+      },
+      include: [{
+        model: db.watchedJourney
+      }]
+    })
+      .then((results) => {
+        done(null, results);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }
 
 
   this.getWatchedRoutesForCustomer = function (done) {
@@ -121,6 +137,24 @@ let GetProfileOptions = function (customer) {
       })
   }
 
+
+
+  this.getSailings = function (done) {
+    axios.get(`http://www.wsdot.wa.gov/Ferries/API/Schedule/rest/sailings/1850`, {
+        params: {
+          'apiaccesscode': process.env.WSDOT_API_KEY
+        }
+      })
+      .then(response => {
+        done(null, response.data)
+      })
+      .catch(err => {
+        console.log(`~~~~~~ Axios Error in getScheduledRoutes: ${err}`);
+      })
+  }
+
+
+
   // this.getScheduleForPreferredRoute = function (done) {
   //   // console.log(`Preferred Route ID in getScheduleForPreferredRoute: ${customer.firstname}`);
 
@@ -141,22 +175,18 @@ let GetProfileOptions = function (customer) {
 
 }
 
-router.get('/:id', (req, res) => {
-  // db.customersRouteCombos.findAll().then(stuff => {
-  //   res.send(stuff)
-  // })
+// router.get('/:id', (req, res) => {
+//   // db.customersRouteCombos.findAll().then(stuff => {
+//   //   res.send(stuff)
+//   // })
 
-  // db.customersRouteCombos.create({
-  //   customerId: 1,
-  //   routeComboId: 2
-  // }).then(stuff => {
-  //   res.send(stuff)
-  // })
-
-
-
-})
-
+//   // db.customersRouteCombos.create({
+//   //   customerId: 1,
+//   //   routeComboId: 2
+//   // }).then(stuff => {
+//   //   res.send(stuff)
+//   // })
+// })
 
 
 router.get('/', (req, res) => {
@@ -164,13 +194,13 @@ router.get('/', (req, res) => {
   // TODO: Create a new express route for triggering a data load on occasion,
   //       then query a routes matrix table for this information.
 
-
   // console.log(res.locals.customer);
   let getProfileOptions = new GetProfileOptions(res.locals.customer);
 
   async.series([
       getProfileOptions.getRouteCombos,
-      getProfileOptions.getWatchedRoutesForCustomer
+      getProfileOptions.getWatchedRoutesForCustomer,
+      getProfileOptions.getWatchedJourns
       // getProfileOptions.getTerminalLocations,
       // getProfileOptions.getScheduledRoutes,
       // getProfileOptions.getRoutes
@@ -179,15 +209,46 @@ router.get('/', (req, res) => {
     ])
     .then(results => {
 
-      // console.log(results[0][0]);
-      // res.json(results[1]);
+      let routeMatrix = results[0];
+      let watchedRoutes = results[1];
+      let watchedJourns = results[2].watchedJourneys;
 
+
+      // if (watchedRoutes.routeCombos.length > 0 && watchedJourns.length > 0) {
+      //   res.render('profile/index', {
+      //     customer: res.locals.customer,
+      //     routeMatrix: routeMatrix,
+      //     watchedRoutes: watchedRoutes,
+      //     watchedJourns: watchedJourns,
+      //     allAsyncResults: results
+      //   });
+      // } else if (watchedRoutes.routeCombos.length > 0) {
+      //   res.render('profile/index', {
+      //     customer: res.locals.customer,
+      //     routeMatrix: routeMatrix,
+      //     watchedRoutes: watchedRoutes,
+      //     allAsyncResults: results
+      //   });
+      // } else {
+      //   res.render('profile/index', {
+      //     customer: res.locals.customer,
+      //     routeMatrix: routeMatrix,
+      //     watchedRoutes: watchedRoutes,
+      //     allAsyncResults: results
+      //   });
+      // }
+
+
+
+      // res.json(watchedJourns);
       res.render('profile/index', {
         customer: res.locals.customer,
-        routeMatrix: results[0],
-        watchedRoutes: results[1],
+        routeMatrix: routeMatrix,
+        watchedRoutes: watchedRoutes,
+        watchedJourns: watchedJourns,
         allAsyncResults: results
       });
+
     })
 })
 
@@ -200,84 +261,50 @@ router.post('/', (req, res) => {
   console.log(res.locals.customer.id)
 
   db.customer.findByPk(res.locals.customer.id)
-  .then((cust) => {
+    .then((cust) => {
 
-    // console.log(`~~~~ wr: ${wr.id}`);
-    db.routeCombo.findOrCreate({
-      where: {
-        id: wr.id
-      }
+      // console.log(`~~~~ wr: ${wr.id}`);
+      db.routeCombo.findOrCreate({
+          where: {
+            id: wr.id
+          }
+        })
+        .spread((routeCombo, created) => {
+          cust.addRouteCombo(routeCombo)
+            .then(() => {
+              res.redirect('/profile');
+            })
+        })
     })
-    .spread((routeCombo, created) => {
-      cust.addRouteCombo(routeCombo)
-      .then(() => {
-        res.redirect('/profile');
-      })
+    .catch(err => {
+      console.log(`~~~~~ Err in find customer: ${err}`);
     })
-  })
-  .catch(err => {
-    console.log(`~~~~~ Err in find customer: ${err}`);
-  })
-
-
-  //   db.article.findByPk(req.body.articleId)
-  //   .then((article) => {
-  //     db.tag.findOrCreate({
-  //       where: { name: req.body.name }
-  //     })
-  //     .spread((tag, created) => {
-  //       article.addTag(tag)
-  //       .then((tag) => {
-  //         res.redirect(`/articles/${article.id}`)
-  //       })
-  //     })
-  //     .catch((error) => {
-  //       console.log(error);
-  //       res.status(400).render('main/404')
-  //     })
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //     res.status(400).render('main/404')
-  //   })
-  
-  
-
-
-
-
-  // db.customer.update({
-  //     where: {
-  //       id: res.locals.customer.id
-  //     }
-  //   }, {
-  //     firstname: req.body.firstname,
-  //   })
-  //   .then((result) => {
-  //     let wr = JSON.parse(req.body.preferredroute);
-  //     db.routeCombo.findOne({
-  //         where: {
-  //           departingTerminalId: wr.departingTerminalId,
-  //           arrivingTerminalId: wr.arrivingTerminalId,
-  //           routeId: wr.routeId
-  //         }
-  //       })
-  //       .then((route) => {
-  //         console.log(`~~~~~~ routeCombo found: ${route}`);
-  //         db.customer.addCustomer([3])
-  //           .then((result) => {
-  //             console.log(`~~~~~ result: ${result}`)
-  //           })
-  //       })
-  //       .catch(err => {
-  //         console.log(err);
-  //       })
-  //   })
-  //   .catch(err => {
-  //     console.log(`${err}`)
-  //   })
 
   // res.redirect('/profile');
+})
+
+router.post('/addJourneys', (req, res) => {
+  // res.send(req.body);
+
+  db.customer.findByPk(res.locals.customer.id)
+    .then((cust) => {
+      // console.log(`~~~~ wr: ${wr.id}`);
+      db.watchedJourney.findOrCreate({
+          where: {
+            journyId: req.body.journeyid
+          }
+        })
+        .spread((journ, created) => {
+          cust.addWatchedJourney(journ)
+            .then(() => {
+              res.redirect('/profile');
+            })
+        })
+    })
+    .catch(err => {
+      console.log(`~~~~~ Err in find customer: ${err}`);
+    })
+
 })
 
 module.exports = router;

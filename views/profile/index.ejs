@@ -12,43 +12,66 @@
 <hr />
 
 <label for="firstname">First Name</label>:
-<input id="firstname" type="text" name="firstname" value="<%= customer.firstname %>" placeholder="First Name" form="profileform">
+<input id="firstname" type="text" name="firstname" value="<%= customer.firstname %>" placeholder="First Name"
+  form="profileform">
 
 <div>
-  Watch Route: 
-  <select id="preferredroute" name="preferredroute" form="profileform">
-    <% routeMatrix.forEach(rm => { %>
-      <% if (rm.routeId === customer.preferredrouteid) { %>
-        <option value='{"id": <%= rm.id %>, "routeId": <%= rm.routeId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}' selected><%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
-      <% } else { %>
-        <option value='{"id": <%= rm.id %>, "routeId": <%= rm.routeId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}'><%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
-      <% } %>
-    <% }) %>
-  </select> 
-</div>    
+  <% if (watchedRoutes.routeCombos.length > 0) { %>
+    <div>
+      <p>Frequent Routes:</p>
+      <ul>
+        <% watchedRoutes.routeCombos.forEach(r => {  %>
+        <li>
+          <a href="/routes/<%= r.id %>/<%= r.departingTerminalId %>"><%= r.departingTerminalName %> to
+            <%= r.arrivingTerminalName %></a>
+        </li>
+        <% }) %>
+      </ul>
+    </div>
+    <% } %>
+    
+    <div>
+      <form id="profileform" method="POST" action="/profile">
 
-<div>
-  <form id="profileform" method="POST" action="/profile">
-    <button type="submit">Add Route</button>
-  </form>
+        <select id="preferredroute" name="preferredroute">
+          <% routeMatrix.forEach(rm => { %>
+          <% if (rm.routeId === customer.preferredrouteid) { %>
+          <option
+            value='{"id": <%= rm.id %>, "routeId": <%= rm.routeId %>, "scheduledRouteId": <%= rm.scheduledRouteId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}'
+            selected><%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
+          <% } else { %>
+          <option
+            value='{"id": <%= rm.id %>, "routeId": <%= rm.routeId %>, "scheduledRouteId": <%= rm.scheduledRouteId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}'>
+            <%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
+          <% } %>
+          <% }) %>
+        </select>
+
+        <button type="submit">Save Frequently Used Route</button>
+      </form>
+    </div>
+
+
 </div>
+
 
 <hr />
 
 
-<div>
-  <p>Currently Watched Routes</p>
-  <ul>
-  <% watchedRoutes.routeCombos.forEach(r => {  %>
-    <li> 
-      <a href="#"><%= r.departingTerminalName %> to <%= r.arrivingTerminalName %></a>
-    </li>
-  <% }) %>
-  </ul>
-</div>
+<% if (watchedJourns.length > 0) { %>
+  <p>Watched Journy Count: <%= watchedJourns.length %> </p>
+  <div>
+    <p>Currently Watched Journeys</p>
+    <ul>
+      <% watchedJourns.forEach(j => {  %>
+      <li>
+        <a href="#"><%= j.journyId %></a>
+        </li>
+      <% }) %>
+    </ul>
+  </div>
+  <% } %>
 
-
-<hr />
 
 <!-- 
 <p>Best walking time from current location:</p>
@@ -65,7 +88,7 @@
  -->
 
 
-    <!-- 
+<!-- 
 <div id='map'></div>
 <script>
   mapboxgl.accessToken = 'pk.eyJ1IjoiYmViLSIsImEiOiJjanpsbGpuZjMwd2ttM2JrNmtyNTVldGM0In0.Tmu9yv3-2cWJFxiq87xFPQ';
