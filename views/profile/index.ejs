@@ -16,12 +16,12 @@
 
 <div>
   Watch Route: 
-  <select id="preferredrouteid" name="preferredrouteid" form="profileform">
+  <select id="preferredroute" name="preferredroute" form="profileform">
     <% routeMatrix.forEach(rm => { %>
       <% if (rm.routeId === customer.preferredrouteid) { %>
-        <option value='{"routeId": <%= rm.routeId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}' selected><%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
+        <option value='{"id": <%= rm.id %>, "routeId": <%= rm.routeId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}' selected><%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
       <% } else { %>
-        <option value='{"routeId": <%= rm.routeId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}'><%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
+        <option value='{"id": <%= rm.id %>, "routeId": <%= rm.routeId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}'><%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
       <% } %>
     <% }) %>
   </select> 
@@ -35,11 +35,16 @@
 
 <hr />
 
+
 <div>
   <p>Currently Watched Routes</p>
-
-
-
+  <ul>
+  <% watchedRoutes.routeCombos.forEach(r => {  %>
+    <li> 
+      <a href="#"><%= r.departingTerminalName %> to <%= r.arrivingTerminalName %></a>
+    </li>
+  <% }) %>
+  </ul>
 </div>
 
 

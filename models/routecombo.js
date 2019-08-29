@@ -10,6 +10,10 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   routeCombo.associate = function(models) {
     // associations can be defined here
+    // models.routeCombo.belongsToMany(models.customer, {through: 'customersRouteCombos', foreignKey: 'routeComboId'});
+    models.routeCombo.belongsToMany(models.customer, {
+      through: 'customersRouteCombos'
+    });
   };
   return routeCombo;
 };

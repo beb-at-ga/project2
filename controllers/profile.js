@@ -28,19 +28,36 @@ let GetProfileOptions = function (customer) {
 
 
 
-  this.getCurrentlyWatchedRoutes = function (done) {
+  this.getRouteCombos = function (done) {
     // Make Customer to Route and Teminals Many to Many through the watched Route Table.
-    // console.log(`~~~~ In getCurrentlyWatchedRoutes.`)
+    // console.log(`~~~~ In getRouteCombos.`)
     db.routeCombo.findAll()
-    .then(results => {
-      // console.log(results);
-      done(null, results);
-    })
-    .catch(err => {
-      console.log(`~~~~~ Err: ${err}`);
-    })
+      .then(results => {
+        done(null, results);
+      })
+      .catch(err => {
+        console.log(`~~~~~ Err: ${err}`);
+      })
   }
 
+
+
+  this.getWatchedRoutesForCustomer = function (done) {
+    db.customer.findOne({
+        where: {
+          id: customer.id
+        },
+        include: [{
+          model: db.routeCombo
+        }]
+      })
+      .then((results) => {
+        done(null, results);
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+  }
 
 
   this.getTerminalLocations = function (done) {
@@ -124,6 +141,24 @@ let GetProfileOptions = function (customer) {
 
 }
 
+router.get('/:id', (req, res) => {
+  // db.customersRouteCombos.findAll().then(stuff => {
+  //   res.send(stuff)
+  // })
+
+  // db.customersRouteCombos.create({
+  //   customerId: 1,
+  //   routeComboId: 2
+  // }).then(stuff => {
+  //   res.send(stuff)
+  // })
+
+
+
+})
+
+
+
 router.get('/', (req, res) => {
 
   // TODO: Create a new express route for triggering a data load on occasion,
@@ -134,7 +169,8 @@ router.get('/', (req, res) => {
   let getProfileOptions = new GetProfileOptions(res.locals.customer);
 
   async.series([
-      getProfileOptions.getCurrentlyWatchedRoutes
+      getProfileOptions.getRouteCombos,
+      getProfileOptions.getWatchedRoutesForCustomer
       // getProfileOptions.getTerminalLocations,
       // getProfileOptions.getScheduledRoutes,
       // getProfileOptions.getRoutes
@@ -143,70 +179,105 @@ router.get('/', (req, res) => {
     ])
     .then(results => {
 
-
       // console.log(results[0][0]);
-      // res.json(results[0]);
+      // res.json(results[1]);
+
       res.render('profile/index', {
         customer: res.locals.customer,
         routeMatrix: results[0],
+        watchedRoutes: results[1],
         allAsyncResults: results
       });
     })
-  // .then(results => {
-  //   // the first array, results[0] is from the first call, array[1] from the second, etc...
-
-  // })
 })
 
 //https://api.mapbox.com/directions-matrix/v1/mapbox/walking/-122.335444,47.6080696;-122.340472,47.602501?sources=1&annotations=distance,duration&access_token=pk.eyJ1IjoiYmViLSIsImEiOiJjanpsbGpuZjMwd2ttM2JrNmtyNTVldGM0In0.Tmu9yv3-2cWJFxiq87xFPQ
 
 router.post('/', (req, res) => {
 
-  // console.log(req.body);
+  console.log(req.body);
+  let wr = JSON.parse(req.body.preferredroute);
+  console.log(res.locals.customer.id)
 
-  db.customer.update({
-      firstname: req.body.firstname,
-      // preferredrouteid: req.body.preferredrouteid
-    }, {
+  db.customer.findByPk(res.locals.customer.id)
+  .then((cust) => {
+
+    // console.log(`~~~~ wr: ${wr.id}`);
+    db.routeCombo.findOrCreate({
       where: {
-        id: res.locals.customer.id
+        id: wr.id
       }
     })
-    .then((result) => {
-
-      let wr = JSON.parse(req.body.preferredrouteid);
-
-      db.watchedRoute.findOrCreate({
-          where: {
-            customerId: res.locals.customer.id,
-            departingTerminalId: wr.departingTerminalId,
-            arrivingTerminalId: wr.arrivingTerminalId,
-            routeId: wr.routeId
-          },
-          defaults: {
-            customerId: res.locals.customer.id,
-            routeId: wr.routeId,
-            departingTerminalId: wr.departingTerminalId,
-            arrivingTerminalId: wr.arrivingTerminalId
-          }
-        })
-        .spread((watchedRoute, wasCreated) => {
-          if (wasCreated) {
-            console.log('watchedRoute was created.')
-          } else {
-            console.log('watchedRoute was not created.')
-          }
-        })
-        .catch(err => {
-          console.log(err);
-        })
+    .spread((routeCombo, created) => {
+      cust.addRouteCombo(routeCombo)
+      .then(() => {
+        res.redirect('/profile');
+      })
     })
-    .catch(err => {
-      console.log(`${err}`)
-    })
+  })
+  .catch(err => {
+    console.log(`~~~~~ Err in find customer: ${err}`);
+  })
 
-  res.redirect('/profile');
+
+  //   db.article.findByPk(req.body.articleId)
+  //   .then((article) => {
+  //     db.tag.findOrCreate({
+  //       where: { name: req.body.name }
+  //     })
+  //     .spread((tag, created) => {
+  //       article.addTag(tag)
+  //       .then((tag) => {
+  //         res.redirect(`/articles/${article.id}`)
+  //       })
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //       res.status(400).render('main/404')
+  //     })
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //     res.status(400).render('main/404')
+  //   })
+  
+  
+
+
+
+
+  // db.customer.update({
+  //     where: {
+  //       id: res.locals.customer.id
+  //     }
+  //   }, {
+  //     firstname: req.body.firstname,
+  //   })
+  //   .then((result) => {
+  //     let wr = JSON.parse(req.body.preferredroute);
+  //     db.routeCombo.findOne({
+  //         where: {
+  //           departingTerminalId: wr.departingTerminalId,
+  //           arrivingTerminalId: wr.arrivingTerminalId,
+  //           routeId: wr.routeId
+  //         }
+  //       })
+  //       .then((route) => {
+  //         console.log(`~~~~~~ routeCombo found: ${route}`);
+  //         db.customer.addCustomer([3])
+  //           .then((result) => {
+  //             console.log(`~~~~~ result: ${result}`)
+  //           })
+  //       })
+  //       .catch(err => {
+  //         console.log(err);
+  //       })
+  //   })
+  //   .catch(err => {
+  //     console.log(`${err}`)
+  //   })
+
+  // res.redirect('/profile');
 })
-
 
 module.exports = router;

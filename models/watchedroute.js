@@ -8,7 +8,8 @@ module.exports = (sequelize, DataTypes) => {
   }, {});
   watchedRoute.associate = function(models) {
     // associations can be defined here
-    models.watchedRoute.belongsTo(models.customer);
+    // models.watchedRoute.belongsTo(models.customer);
+    
   };
   return watchedRoute;
 };

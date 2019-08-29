@@ -41,7 +41,11 @@ module.exports = (sequelize, DataTypes) => {
   });
   customer.associate = function(models) {
     // associations can be defined here
-    models.customer.hasMany(models.watchedRoute)
+    // models.customer.hasMany(models.watchedRoute)
+    // models.customer.belongsToMany(models.routeCombo, {through: 'customersRouteCombos', foreignKey: 'customerId'});
+    models.customer.belongsToMany(models.routeCombo, {
+      through: 'customersRouteCombos'
+    });
   };
 
   // custom function: validPassword(password)
