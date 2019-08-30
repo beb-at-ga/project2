@@ -6,11 +6,11 @@
     <% if (customer) { %>
     <% if (customer.firstname) { %>
     <li>
-      <a href="/profile" class="teal-text text-darken-2">Welcome Back, <%= customer.firstname %></a>
+      <a href="/preferences" class="teal-text text-darken-2">Welcome Back, <%= customer.firstname %></a>
     </li>
     <% } else { %>
       <li>
-      <a href="/profile" class="teal-text text-darken-2">Profile</a>
+      <a href="/preferences" class="teal-text text-darken-2">Preferences</a>
     </li>
     <% }; %>
     <li>

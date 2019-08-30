@@ -3,7 +3,7 @@ const db = require('../models');
 const passport = require('../config/passportConfig');
 
 router.get('/', (req, res) => {
-  // if already logged in, redirect to profile, otherwise to auth/index
+  // if already logged in, redirect to preferences, otherwise to auth/index
   res.render('auth/index');
 })
 
@@ -26,13 +26,13 @@ router.post('/register', (req, res) => {
         if (wasCreated) {
           // customer created sucesfully
           passport.authenticate('local', {
-            successRedirect: '/profile',
+            successRedirect: '/preferences',
             successsFlash: 'w00t!',
             failureRedirect: '/auth/login',
             failureFlash: 'This should never happen. Contact your administrator.'
           })(req, res);
 
-          // res.render('profile/index');
+          // res.render('preferences/index');
         } else {
           // user was found, don't let them create a new account. make them sign in.
           // req.flash('error', 'Account already exists. Please sign in instead.')
@@ -62,7 +62,7 @@ router.post('/register', (req, res) => {
 })
 
 router.post('/signin', passport.authenticate('local', {
-  successRedirect: '/profile',
+  successRedirect: '/preferences',
   successsFlash: 'w00t!',
   failureRedirect: '/auth',
   failureFlash: 'Invalid credentials. Please try again.'

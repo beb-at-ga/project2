@@ -27,7 +27,7 @@
 
 
 ## For Example: create a customers table.
-- sequelize model:create --name customer --attributes "username:string, firstname:string, lastname:string, email:string, password:string, birtday:date, admin:boolean, bio:text, profile:text"
+- sequelize model:create --name customer --attributes "username:string, firstname:string, lastname:string, email:string, password:string, birtday:date, admin:boolean, bio:text, preferences:text"
 
 - sequelize model:create --name outfit --attributes "color:string, style:string, size:float, type:string, material:string, dinoId:integer"
 

@@ -72,7 +72,7 @@ if (typeof data !== 'undefined') {
         success: function (postResponse) {
           console.log('success');
           console.log(JSON.stringify(postResponse));
-          window.location.replace("/profile");
+          window.location.replace("/preferences");
         }
       });
     });

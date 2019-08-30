@@ -4,7 +4,7 @@ const db = require('../models');
 const moment = require('moment');
 const async = require('async');
 
-let GetProfileOptions = function (customer) {
+let GetPreferencesOptions = function (customer) {
 
   this.customer = customer;
 
@@ -28,16 +28,16 @@ let GetProfileOptions = function (customer) {
 
 router.get('/', (req, res) => {
 
-  let getProfileOptions = new GetProfileOptions(res.locals.customer);
+  let getPreferencesOptions = new GetPreferencesOptions(res.locals.customer);
 
   async.series([
-      getProfileOptions.getWatchedJourneys
+      getPreferencesOptions.getWatchedJourneys
     ])
     .then(results => {
       let watchedJourneys = results[0].watchedJourneys;
 
       // res.json(watchedJourneys);
-      res.render('profile/profile', {
+      res.render('preferences/preferences', {
         moment: moment,
         customer: res.locals.customer,
         watchedJourneys
@@ -55,7 +55,7 @@ router.post('/update', (req, res) => {
       }
     })
     .then(() => {
-      res.redirect('/profile');
+      res.redirect('/preferences');
     })
 })
 
@@ -248,7 +248,7 @@ module.exports = router;
 //         })
 //     })
 //     .then((cust) => {
-//       res.redirect('/profile');
+//       res.redirect('/preferences');
 //     })
 //     .catch(err => {
 //       console.log(`~~~~~ Err in find customer: ${err}`);
@@ -272,7 +272,7 @@ module.exports = router;
 //         .spread((journ, created) => {
 //           cust.addWatchedJourney(journ)
 //             .then(() => {
-//               res.redirect('/profile');
+//               res.redirect('/preferences');
 //             })
 //         })
 //     })
@@ -285,17 +285,17 @@ module.exports = router;
 // //       then query a routes matrix table for this information.
 
 // // console.log(res.locals.customer);
-// let getProfileOptions = new GetProfileOptions(res.locals.customer);
+// let getPreferencesOptions = new GetPreferencesOptions(res.locals.customer);
 
 // async.series([
-//     getProfileOptions.getRouteCombos,
-//     getProfileOptions.getWatchedRoutesForCustomer,
-//     getProfileOptions.getWatchedJourns
-//     // getProfileOptions.getTerminalLocations,
-//     // getProfileOptions.getScheduledRoutes,
-//     // getProfileOptions.getRoutes
-//     // getProfileOptions.getTerminalsByRoute,
-//     // getProfileOptions.getScheduleForPreferredRoute
+//     getPreferencesOptions.getRouteCombos,
+//     getPreferencesOptions.getWatchedRoutesForCustomer,
+//     getPreferencesOptions.getWatchedJourns
+//     // getPreferencesOptions.getTerminalLocations,
+//     // getPreferencesOptions.getScheduledRoutes,
+//     // getPreferencesOptions.getRoutes
+//     // getPreferencesOptions.getTerminalsByRoute,
+//     // getPreferencesOptions.getScheduleForPreferredRoute
 //   ])
 //   .then(results => {
 
@@ -304,7 +304,7 @@ module.exports = router;
 //     let watchedJourns = results[2].watchedJourneys;
 
 //     // if (watchedRoutes.routeCombos.length > 0 && watchedJourns.length > 0) {
-//     //   res.render('profile/index', {
+//     //   res.render('preferences/index', {
 //     //     customer: res.locals.customer,
 //     //     routeMatrix: routeMatrix,
 //     //     watchedRoutes: watchedRoutes,
@@ -312,14 +312,14 @@ module.exports = router;
 //     //     allAsyncResults: results
 //     //   });
 //     // } else if (watchedRoutes.routeCombos.length > 0) {
-//     //   res.render('profile/index', {
+//     //   res.render('preferences/index', {
 //     //     customer: res.locals.customer,
 //     //     routeMatrix: routeMatrix,
 //     //     watchedRoutes: watchedRoutes,
 //     //     allAsyncResults: results
 //     //   });
 //     // } else {
-//     //   res.render('profile/index', {
+//     //   res.render('preferences/index', {
 //     //     customer: res.locals.customer,
 //     //     routeMatrix: routeMatrix,
 //     //     watchedRoutes: watchedRoutes,
@@ -328,7 +328,7 @@ module.exports = router;
 //     // }
 
 // res.json(watchedJourns);
-// res.render('profile/index', {
+// res.render('preferences/index', {
 //   moment: moment,
 //   customer: res.locals.customer,
 //   routeMatrix: routeMatrix,
