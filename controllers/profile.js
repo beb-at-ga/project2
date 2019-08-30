@@ -42,13 +42,13 @@ let GetProfileOptions = function (customer) {
 
   this.getWatchedJourns = function (done) {
     db.customer.findOne({
-      where: {
-        id: customer.id
-      },
-      include: [{
-        model: db.watchedJourney
-      }]
-    })
+        where: {
+          id: customer.id
+        },
+        include: [{
+          model: db.watchedJourney
+        }]
+      })
       .then((results) => {
         done(null, results);
       })
@@ -137,8 +137,6 @@ let GetProfileOptions = function (customer) {
       })
   }
 
-
-
   this.getSailings = function (done) {
     axios.get(`http://www.wsdot.wa.gov/Ferries/API/Schedule/rest/sailings/1850`, {
         params: {
@@ -152,7 +150,6 @@ let GetProfileOptions = function (customer) {
         console.log(`~~~~~~ Axios Error in getScheduledRoutes: ${err}`);
       })
   }
-
 
 
   // this.getScheduleForPreferredRoute = function (done) {
@@ -213,7 +210,6 @@ router.get('/', (req, res) => {
       let watchedRoutes = results[1];
       let watchedJourns = results[2].watchedJourneys;
 
-
       // if (watchedRoutes.routeCombos.length > 0 && watchedJourns.length > 0) {
       //   res.render('profile/index', {
       //     customer: res.locals.customer,
@@ -238,10 +234,9 @@ router.get('/', (req, res) => {
       //   });
       // }
 
-
-
       // res.json(watchedJourns);
       res.render('profile/index', {
+        moment: moment,
         customer: res.locals.customer,
         routeMatrix: routeMatrix,
         watchedRoutes: watchedRoutes,
@@ -254,16 +249,27 @@ router.get('/', (req, res) => {
 
 //https://api.mapbox.com/directions-matrix/v1/mapbox/walking/-122.335444,47.6080696;-122.340472,47.602501?sources=1&annotations=distance,duration&access_token=pk.eyJ1IjoiYmViLSIsImEiOiJjanpsbGpuZjMwd2ttM2JrNmtyNTVldGM0In0.Tmu9yv3-2cWJFxiq87xFPQ
 
+router.post('/update', (req, res) => {
+  db.customer.update({
+      firstname: req.body.firstname
+    }, {
+      where: {
+        id: res.locals.customer.id
+      }
+    })
+    .then(() => {
+      res.redirect('/profile');
+    })
+})
+
+
+
 router.post('/', (req, res) => {
 
-  console.log(req.body);
   let wr = JSON.parse(req.body.preferredroute);
-  console.log(res.locals.customer.id)
 
   db.customer.findByPk(res.locals.customer.id)
     .then((cust) => {
-
-      // console.log(`~~~~ wr: ${wr.id}`);
       db.routeCombo.findOrCreate({
           where: {
             id: wr.id
@@ -272,26 +278,38 @@ router.post('/', (req, res) => {
         .spread((routeCombo, created) => {
           cust.addRouteCombo(routeCombo)
             .then(() => {
-              res.redirect('/profile');
+
             })
         })
+    })
+    .then((cust) => {
+      res.redirect('/profile');
     })
     .catch(err => {
       console.log(`~~~~~ Err in find customer: ${err}`);
     })
-
-  // res.redirect('/profile');
 })
 
+
 router.post('/addJourneys', (req, res) => {
-  // res.send(req.body);
+
+  
+  // res.json(req.body)
+  // console.log((JSON.parse(req.body.journeyData)).departingTerminalId);
+
+
+  // console.log(JSON.parse(req.body.journeyData).journeyId);
 
   db.customer.findByPk(res.locals.customer.id)
     .then((cust) => {
-      // console.log(`~~~~ wr: ${wr.id}`);
       db.watchedJourney.findOrCreate({
           where: {
-            journyId: req.body.journeyid
+            journyId: (JSON.parse(req.body.journeyData)).journeyId,
+            customerId: cust.id
+          },
+          defaults: {
+            departingTerminalId: (JSON.parse(req.body.journeyData)).departingTerminalId,
+            departingTime: (JSON.parse(req.body.journeyData)).departingTime
           }
         })
         .spread((journ, created) => {
@@ -304,7 +322,6 @@ router.post('/addJourneys', (req, res) => {
     .catch(err => {
       console.log(`~~~~~ Err in find customer: ${err}`);
     })
-
 })
 
 module.exports = router;

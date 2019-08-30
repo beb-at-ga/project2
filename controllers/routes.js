@@ -5,10 +5,7 @@ const moment = require('moment');
 const async = require('async');
 
 
-
 let routesForDate = moment().format('YYYY-MM-DD'); // "2019-08-26T08:02:17-05:00"
-
-
 
 let GetScheduleDetails = function (details) {
 
@@ -66,7 +63,7 @@ router.get('/:routeComboId/:departingTerminalId', (req, res) => {
           // filtered for  Journs.TerminalTimes[0].TerminalId === req.params.departingTerminalId
           // res.json(results[0]);
           // res.send(`${routeCombo.departingTerminalId}`);
-          // res.json(l);
+          // res.json(fl);
           res.render('routes/index', {
             moment: moment,
             journs: fl,

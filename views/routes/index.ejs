@@ -4,13 +4,12 @@
 
 <form method="POST" action="/profile/addJourneys">
 
-
-  <select id="journyid" name="journeyid">
+  <select id="journeyData" name="journeyData">
     <% journs.forEach(j => { %>
-        <option value='<%= j.JourneyID %>'><%= j.TerminalID %><%= moment(j.TerminalTimes[0].Time).format("hh:mm A") %></option>
+        <option value='{"journeyId": <%= j.JourneyID %>, "departingTerminalId": <%= j.TerminalTimes[0].TerminalID %>, "departingTime": "<%= j.TerminalTimes[0].Time %>"}'><%= moment(j.TerminalTimes[0].Time).format("hh:mm A") %></option>
     <% }) %>
   </select> 
 
-  <button type="SUBMIT">Watch Journys</button>
+  <button type="SUBMIT">Watch Journey</button>
 </form>
 

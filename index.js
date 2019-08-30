@@ -80,6 +80,7 @@ app.get('/', (req, res) => {
 app.use('/auth', require('./controllers/auth'));
 app.use('/profile', require('./controllers/profile'));
 app.use('/routes', require('./controllers/routes'));
+app.use('/routes2', require('./controllers/routes2'));
 
 
 // app.get('/socket.io', (req, res) => {

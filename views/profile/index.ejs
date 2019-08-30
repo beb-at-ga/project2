@@ -11,45 +11,48 @@
 <p id="location"></p>
 <hr />
 
-<label for="firstname">First Name</label>:
-<input id="firstname" type="text" name="firstname" value="<%= customer.firstname %>" placeholder="First Name"
-  form="profileform">
+
+<form method="POST" action="/profile/update">
+  <label for="firstname">First Name</label>:
+  <input id="firstname" type="text" name="firstname" value="<%= customer.firstname %>" placeholder="First Name">
+  <button type="SUBMIT">Update Profile</button>
+</form>
 
 <div>
   <% if (watchedRoutes.routeCombos.length > 0) { %>
-    <div>
-      <p>Frequent Routes:</p>
-      <ul>
-        <% watchedRoutes.routeCombos.forEach(r => {  %>
-        <li>
-          <a href="/routes/<%= r.id %>/<%= r.departingTerminalId %>"><%= r.departingTerminalName %> to
-            <%= r.arrivingTerminalName %></a>
-        </li>
+  <div>
+    <p>Frequent Routes:</p>
+    <ul>
+      <% watchedRoutes.routeCombos.forEach(r => {  %>
+      <li>
+        <a href="/routes/<%= r.id %>/<%= r.departingTerminalId %>"><%= r.departingTerminalName %> to
+          <%= r.arrivingTerminalName %></a>
+      </li>
+      <% }) %>
+    </ul>
+  </div>
+  <% } %>
+
+  <div>
+    <form method="POST" action="/profile">
+
+      <select id="preferredroute" name="preferredroute">
+        <% routeMatrix.forEach(rm => { %>
+        <% if (rm.routeId === customer.preferredrouteid) { %>
+        <option
+          value='{"id": <%= rm.id %>, "routeId": <%= rm.routeId %>, "scheduledRouteId": <%= rm.scheduledRouteId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}'
+          selected><%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
+        <% } else { %>
+        <option
+          value='{"id": <%= rm.id %>, "routeId": <%= rm.routeId %>, "scheduledRouteId": <%= rm.scheduledRouteId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}'>
+          <%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
+        <% } %>
         <% }) %>
-      </ul>
-    </div>
-    <% } %>
-    
-    <div>
-      <form id="profileform" method="POST" action="/profile">
+      </select>
 
-        <select id="preferredroute" name="preferredroute">
-          <% routeMatrix.forEach(rm => { %>
-          <% if (rm.routeId === customer.preferredrouteid) { %>
-          <option
-            value='{"id": <%= rm.id %>, "routeId": <%= rm.routeId %>, "scheduledRouteId": <%= rm.scheduledRouteId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}'
-            selected><%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
-          <% } else { %>
-          <option
-            value='{"id": <%= rm.id %>, "routeId": <%= rm.routeId %>, "scheduledRouteId": <%= rm.scheduledRouteId %>, "departingTerminalId": <%= rm.departingTerminalId %>, "arrivingTerminalId": <%= rm.arrivingTerminalId %>}'>
-            <%= `${rm.departingTerminalName} -> ${rm.arrivingTerminalName}` %></option>
-          <% } %>
-          <% }) %>
-        </select>
-
-        <button type="submit">Save Frequently Used Route</button>
-      </form>
-    </div>
+      <button type="submit">Add Frequently Used Route</button>
+    </form>
+  </div>
 
 
 </div>
@@ -59,18 +62,37 @@
 
 
 <% if (watchedJourns.length > 0) { %>
-  <p>Watched Journy Count: <%= watchedJourns.length %> </p>
-  <div>
-    <p>Currently Watched Journeys</p>
-    <ul>
+<div style="width:75%">
+<table id="myWatchedJourneys" class="display" style="width:100%">
+  <thead>
+      <tr>
+          <th>Departing Terminal</th>
+          <th>Arriving Terminal</th>
+          <th>Scheduled Departure</th>
+      </tr>
+  </thead>
+  <tbody>
+
       <% watchedJourns.forEach(j => {  %>
-      <li>
-        <a href="#"><%= j.journyId %></a>
-        </li>
+        <tr>
+            <td><%= j.journyId %></td>
+            <td><%= j.departingTerminalId %></td>
+            <td><%= moment(j.departingTime).format("h:mm A") %></td>
+        </tr>
       <% }) %>
-    </ul>
-  </div>
-  <% } %>
+  
+  </tbody>
+  <!-- <tfoot>
+      <tr>
+        <th>Departing Terminal</th>
+        <th>Arriving Terminal</th>
+        <th>Scheduled Departure</th>
+    </tr>
+  </tfoot> -->
+</table>
+<% } %>
+</div>
+
 
 
 <!-- 
