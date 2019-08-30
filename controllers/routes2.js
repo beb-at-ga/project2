@@ -75,18 +75,32 @@ router.get('/', (req, res) => {
     getScheduledRoutes,
     getAllSailings
   ], (err, results) => {
-    let journeys = [];
+    let sailings = [];
     // console.log(results[0].data);
     results.forEach(r => {
       // console.log(r.data);
       r.data.forEach(x => {
-        console.log(x.SchedRouteID);
-        journeys.push(x);
+        // console.log(x.SailingDescription);
+        sailings.push(x);
       })
     })
-    res.render('routes2/test', {journeys});
+    res.render('routes2/test', {
+      moment: moment,
+      sailings
+    });
   })
 })
+
+router.post('/', (req, res) => {
+  console.log(req.body);
+
+
+
+  res.json(req.body);
+
+
+})
+
 
 module.exports = router;
 

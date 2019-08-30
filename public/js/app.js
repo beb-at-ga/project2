@@ -1,74 +1,91 @@
-console.log('Helloooo');
+$.fn.dataTable.ext.search.push(
+  function (settings, data, dataIndex) {
+    let weekPart = $('#weekPart').val();
+    let sWeekPart = (data[4]);
+
+    if ((weekPart === sWeekPart) || (sWeekPart.includes(weekPart))) {
+      return true;
+    } else if (weekPart === 'All') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+);
 
 
-// let routeMatrix = [{
-//     RouteID: 5,
-//     Description: 'Seattle / Bainbridge Island',
-//     DepartingTerminalID: 7,
-//     DepartingTerminalName: 'Seattle',
-//     ArrivingTerminalID: 3,
-//     ArrivingTerminalName: 'Bainbridge Island'
-//   },
-//   {
-//     RouteID: 5,
-//     Description: 'Seattle / Bainbridge Island',
-//     DepartingTerminalID: 3,
-//     DepartingTerminalName: 'Bainbridge Island',
-//     ArrivingTerminalID: 7,
-//     ArrivingTerminalName: 'Seattle'
-//   }
-// ]
 
 
-// const socket = io();
-// const chatFormEl = document.getElementById('chat-form');
+$(document).ready(function () {
+  let table = $('#sailings').DataTable({
+    data: data,
+    "pageLength": 25,
+    "order": [
+      [3, "asc"],
+      [4, "asc"]
+    ],
+    "columnDefs": [{
+        "targets": [0],
+        "visible": false,
+        "searchable": false
+      },
+      {
+        "targets": [1],
+        "visible": false,
+        "searchable": false
+      },
+      // {
+      //   "targets": [2],
+      //   "visible": false,
+      //   "searchable": false
+      // }
+    ]
+  });
 
-// chatFormEl.addEventListener('submit', (e) => {
-//   e.preventDefault();
-//   let message = e.target.chat.value;
-//   let name = e.target.name.value;
+  $('#weekPart').change(function () {
+    table.draw();
+  });
 
-//   let obj = {
-//     name,
-//     message
-//   }
+  $('#sailings tbody').on('click', 'tr', function (e) {
+    e.preventDefault();
+    console.log(e);
+    let row = table.row(this).data();
+    // row[column]
 
-//   socket.emit('chat message', obj);
-//   e.target.chat.value = '';
+    let data = {};
 
-// });
+    data.ScheduleID = row[0];
+    data.SchedRouteID = row[1];
+    data.JourneyID = row[2];
+    data.TerminalDescription = row[3];
+    data.DayOpDescription = row[4];
+    data.Time = row[5];
+    data.VesselName = row[6];
 
-// socket.on('chat message', (msg) => {
-//   let p = document.createElement('p');
-//   p.innerText = `${msg.name} says: ${msg.message}`;
-//   document.getElementById('messages').appendChild(p);
-// })
-
-
-// document.addEventListener('DOMContentLoaded', () => {
-//   var elems = document.querySelectorAll('.modal');
-//   var instances = M.Modal.init(elems, {
-//     // options here.
-//   });
-// });
-
-$(document).ready(function() {
-  $('#journeys').DataTable();
-} );
-
-
-// let preferred_terminal_on_route = document.getElementById('preferred_terminal_on_route'); 
-// let preferred_departure = document.getElementById('preferred_departure'); 
+    $.ajax({
+      type: 'POST',
+      data: JSON.stringify(data),
+      contentType: 'application/json',
+      url: 'http://localhost:3000/routes2',
+      success: function (data) {
+        console.log('success');
+        console.log(JSON.stringify(data));
+      }
+    });
+  });
+});
 
 
-// document.getElementById('preferredrouteid').addEventListener('change', (event) => {
-//   // console.log(event.target.value);
 
-//   console.log(event.target.value);
 
-// });
+
+
+
+
+
 
 let loc = document.getElementById('location');
+
 function getLocation() {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(showPosition);

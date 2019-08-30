@@ -1,65 +1,54 @@
 <h1>Hello routes2.</h1>
 
-<!-- 
-
-<% journeys.forEach(j => { %>
-  <p><%= j.SailingID %> </p>
-<% }) %>
-
- -->
-
-  <div style="width:75%">
-  <table id="journeys" class="display" style="width:100%">
+<hr />
+<div style="width:100%">
+  <table id="sailings" class="display" style="width:100%">
     <thead>
-        <tr>
-            <th>C1</th>
-            <th>C2</th>
-            <th>C3</th>
-            <th>C4</th>
-            <th>C5</th>
-            <th>C6</th>
-        </tr>
+      <tr>
+        <th>ScheduleID</th>
+        <th>SchedRouteID</th>
+        <th>JourneyID</th>
+        <th>Departing Terminal</th>
+        <th>Days of Week</th>
+        <th>Departure Time</th>
+        <th>VesselName</th>
+        <th></th>
+      </tr>
     </thead>
     <tbody>
+        <select id="weekPart" name="weekPart">
+            <option value="All" selected>All Weekly Schedules</option>
+            <option value="Daily">Daily Schedules</option>
+            <option value="Monday through Friday">Monday through Friday Schedules</option>
+            <option value="Sunday">Saturday, Sunday, and Holidays Schedules</option>
+        </select>
     </tbody>
-    <tfoot>
-        <tr>
-            <th>C1</th>
-            <th>C2</th>
-            <th>C3</th>
-            <th>C4</th>
-            <th>C5</th>
-            <th>C6</th>
-      </tr>
-    </tfoot>
+    <tfoot></tfoot>
   </table>
-  </div>
+</div>
 
 
 <script>
-
-var data = [
-    [
-        "Tiger Nixon",
-        "System Architect",
-        "Edinburgh",
-        "5421",
-        "2011/04/25",
-        "$3,120"
-    ],
-    [
-        "Garrett Winters",
-        "Director",
-        "Edinburgh",
-        "8422",
-        "2011/07/25",
-        "$5,300"
-    ]
-]
-
-$('#journeys').DataTable( {
-    data: data
-} );
-
-
+  var data = [
+    <% sailings.forEach(s => { %>
+      <% s.Journs.forEach(j => { %>
+        <% j.TerminalTimes.forEach(t => { %>
+          [
+            <%= s.ScheduleID %>, 
+            <%= s.SchedRouteID %>, 
+            <%= j.JourneyID %>,
+            "<%= t.TerminalDescription %>",
+            "<%= s.DayOpDescription %>",
+            "<%= moment(t.Time).format('hh:mm A') %>",
+            "<%= j.VesselName %>",
+            ""
+          ],
+        <% }) %>
+      <% }) %>
+    <% }) %>
+  ]
 </script>
+
+
+
+
