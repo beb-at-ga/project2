@@ -2,13 +2,18 @@
 module.exports = (sequelize, DataTypes) => {
   const watchedJourney = sequelize.define('watchedJourney', {
     customerId: DataTypes.INTEGER,
-    journyId: DataTypes.INTEGER,
-    departingTerminalId: DataTypes.INTEGER,
-    departingTime: DataTypes.STRING
+    JourneyID: DataTypes.INTEGER,
+    ScheduleID: DataTypes.INTEGER,
+    SchedRouteID: DataTypes.INTEGER,
+    TerminalDescription: DataTypes.STRING,
+    DayOpDescription: DataTypes.STRING,
+    Time: DataTypes.STRING,
+    VesselName: DataTypes.STRING
   }, {});
-  watchedJourney.associate = function(models) {
-    // associations can be defined here
+  watchedJourney.associate = function (models) {
+
     models.watchedJourney.belongsTo(models.customer);
+
   };
   return watchedJourney;
 };

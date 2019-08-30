@@ -63,5 +63,5 @@
 - sequelize model:create --name customersRouteCombos --attributes "customerId:integer, routeComboId:integer"
 
 
+- sequelize model:create --name watchedJourney --attributes "customerId:integer, JourneyID:integer, ScheduleID:integer, SchedRouteID:integer, TerminalDescription:string, DayOpDescription:string, Time:string, VesselName:string"
 
-- sequelize model:create --name watchedJourney --attributes "customerId:integer, journyId:integer"

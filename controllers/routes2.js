@@ -84,7 +84,7 @@ router.get('/', (req, res) => {
         sailings.push(x);
       })
     })
-    res.render('routes2/test', {
+    res.render('routes2/selectRoutes', {
       moment: moment,
       sailings
     });
@@ -92,14 +92,36 @@ router.get('/', (req, res) => {
 })
 
 router.post('/', (req, res) => {
-  console.log(req.body);
-
-
-
-  res.json(req.body);
-
-
+  db.customer.findByPk(res.locals.customer.id)
+    .then((cust) => {
+      db.watchedJourney.findOrCreate({
+          where: {
+            customerId: cust.id,
+            JourneyID: req.body.JourneyID
+          },
+          defaults: req.body
+        })
+        .then(() => {
+          res.json(req.body);
+        })
+    })
 })
+
+
+router.delete(('/:JourneyID'), (req, res) => {
+  console.log(req.body)
+  db.watchedJourney.destroy({
+    where: {
+      customerId: res.locals.customer.id,
+      JourneyID: req.params.JourneyID
+    }
+  })
+  .then(() => {
+    res.json(req.body);
+  })
+  
+})
+
 
 
 module.exports = router;

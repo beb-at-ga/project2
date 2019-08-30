@@ -1,6 +1,10 @@
-$.fn.dataTable.ext.search.push(
-  function (settings, data, dataIndex) {
-    let weekPart = $('#weekPart').val();
+// console.log('Hello');
+// let data;
+
+if (typeof data !== 'undefined') {
+
+  $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+    let weekPart = $('#weekPart').val() || 'All';
     let sWeekPart = (data[4]);
 
     if ((weekPart === sWeekPart) || (sWeekPart.includes(weekPart))) {
@@ -10,79 +14,135 @@ $.fn.dataTable.ext.search.push(
     } else {
       return false;
     }
-  }
-);
-
-
-
-
-$(document).ready(function () {
-  let table = $('#sailings').DataTable({
-    data: data,
-    "pageLength": 25,
-    "order": [
-      [3, "asc"],
-      [4, "asc"]
-    ],
-    "columnDefs": [{
-        "targets": [0],
-        "visible": false,
-        "searchable": false
-      },
-      {
-        "targets": [1],
-        "visible": false,
-        "searchable": false
-      },
-      // {
-      //   "targets": [2],
-      //   "visible": false,
-      //   "searchable": false
-      // }
-    ]
   });
 
-  $('#weekPart').change(function () {
-    table.draw();
-  });
+  $(document).ready(function () {
+    let table = $('#sailings').DataTable({
+      data: data,
+      "pageLength": 25,
+      "order": [
+        [3, "asc"],
+        [4, "asc"]
+      ],
+      "columnDefs": [{
+          "targets": [0],
+          "visible": false,
+          "searchable": false
+        },
+        {
+          "targets": [1],
+          "visible": false,
+          "searchable": false
+        },
+        {
+          "targets": [2],
+          "visible": false,
+          "searchable": false
+        }
+      ]
+    });
 
-  $('#sailings tbody').on('click', 'tr', function (e) {
-    e.preventDefault();
-    console.log(e);
-    let row = table.row(this).data();
-    // row[column]
+    $('#weekPart').change(function () {
+      table.draw();
+    });
 
-    let data = {};
+    $('#sailings tbody').on('click', 'tr', function (e) {
+      e.preventDefault();
+      console.log(e);
 
-    data.ScheduleID = row[0];
-    data.SchedRouteID = row[1];
-    data.JourneyID = row[2];
-    data.TerminalDescription = row[3];
-    data.DayOpDescription = row[4];
-    data.Time = row[5];
-    data.VesselName = row[6];
+      let row = table.row(this);
+      let rowData = table.row(this).data();
+      // rowData[column]
 
-    $.ajax({
-      type: 'POST',
-      data: JSON.stringify(data),
-      contentType: 'application/json',
-      url: 'http://localhost:3000/routes2',
-      success: function (data) {
-        console.log('success');
-        console.log(JSON.stringify(data));
-      }
+      let postBody = {};
+
+      postBody.ScheduleID = rowData[0];
+      postBody.SchedRouteID = rowData[1];
+      postBody.JourneyID = rowData[2];
+      postBody.TerminalDescription = rowData[3];
+      postBody.DayOpDescription = rowData[4];
+      postBody.Time = rowData[5];
+      postBody.VesselName = rowData[6];
+
+      $.ajax({
+        type: 'POST',
+        data: JSON.stringify(postBody),
+        contentType: 'application/json',
+        url: '/routes2',
+        success: function (postResponse) {
+          console.log('success');
+          console.log(JSON.stringify(postResponse));
+          window.location.replace("/profile");
+        }
+      });
     });
   });
-});
 
+  $(document).ready(function () {
+    let table = $('#watchedJourneys').DataTable({
+      data: data,
+      "dom": "",
+      "order": [
+        [3, "asc"],
+        [4, "asc"]
+      ],
+      "columnDefs": [{
+          "targets": [0],
+          "visible": false,
+          "searchable": false
+        },
+        {
+          "targets": [1],
+          "visible": false,
+          "searchable": false
+        },
+        {
+          "targets": [2],
+          "visible": false,
+          "searchable": false
+        }
+      ]
+    });
 
+    $('#weekPart').change(function () {
+      table.draw();
+    });
 
+    $('#watchedJourneys tbody').on('click', 'tr', function (e) {
+      e.preventDefault();
+      console.log(e);
 
+      let row = table.row(this);
+      let rowData = table.row(this).data();
+      // rowData[column]
 
+      let postBody = {};
 
+      postBody.ScheduleID = rowData[0];
+      postBody.SchedRouteID = rowData[1];
+      postBody.JourneyID = rowData[2];
+      postBody.TerminalDescription = rowData[3];
+      postBody.DayOpDescription = rowData[4];
+      postBody.Time = rowData[5];
+      postBody.VesselName = rowData[6];
 
-
-
+      $.ajax({
+        type: 'POST',
+        data: JSON.stringify(postBody),
+        contentType: 'application/json',
+        url: `http://localhost:3000/routes2/${rowData[2]}?_method=DELETE`,
+        success: function (postResponse) {
+          console.log('success');
+          console.log(JSON.stringify(postResponse));      
+          row.remove().draw();
+        }
+      })
+      .then(() => {
+        
+      });
+    });
+  });
+}
 
 let loc = document.getElementById('location');
 

@@ -11,8 +11,26 @@ module.exports = {
       customerId: {
         type: Sequelize.INTEGER
       },
-      journyId: {
+      JourneyID: {
         type: Sequelize.INTEGER
+      },
+      ScheduleID: {
+        type: Sequelize.INTEGER
+      },
+      SchedRouteID: {
+        type: Sequelize.INTEGER
+      },
+      TerminalDescription: {
+        type: Sequelize.STRING
+      },
+      DayOpDescription: {
+        type: Sequelize.STRING
+      },
+      Time: {
+        type: Sequelize.STRING
+      },
+      VesselName: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,

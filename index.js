@@ -2,6 +2,8 @@ require('dotenv').config();
 
 const express = require('express');
 const layouts = require('express-ejs-layouts');
+const methodOverride = require('method-override');
+
 const flash = require('connect-flash');
 const passport = require('./config/passportConfig');
 const session = require('express-session');
@@ -44,7 +46,7 @@ const sessionConfig = {
   }
 }
 
-
+app.use(methodOverride('_method'));
 app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(layouts);

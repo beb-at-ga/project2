@@ -11,8 +11,7 @@
         <th>Departing Terminal</th>
         <th>Days of Week</th>
         <th>Departure Time</th>
-        <th>VesselName</th>
-        <th></th>
+        <th>VesselName</th>=
       </tr>
     </thead>
     <tbody>
@@ -29,19 +28,18 @@
 
 
 <script>
-  var data = [
+  let data = [
     <% sailings.forEach(s => { %>
       <% s.Journs.forEach(j => { %>
         <% j.TerminalTimes.forEach(t => { %>
           [
-            <%= s.ScheduleID %>, 
-            <%= s.SchedRouteID %>, 
-            <%= j.JourneyID %>,
-            "<%= t.TerminalDescription %>",
-            "<%= s.DayOpDescription %>",
-            "<%= moment(t.Time).format('hh:mm A') %>",
-            "<%= j.VesselName %>",
-            ""
+            '<%= s.ScheduleID %>', 
+            '<%= s.SchedRouteID %>', 
+            '<%= j.JourneyID %>',
+            '<%= t.TerminalDescription %>',
+            '<%= s.DayOpDescription %>',
+            '<%= moment(t.Time).format("hh:mm A") %>',
+            '<%= j.VesselName %>',
           ],
         <% }) %>
       <% }) %>
