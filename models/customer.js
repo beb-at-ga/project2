@@ -42,15 +42,8 @@ module.exports = (sequelize, DataTypes) => {
   customer.associate = function(models) {
     // associations can be defined here
     models.customer.hasMany(models.watchedJourney)
-    // models.customer.belongsToMany(models.routeCombo, {through: 'customersRouteCombos', foreignKey: 'customerId'});
-    models.customer.belongsToMany(models.routeCombo, {
-      through: 'customersRouteCombos'
-    });
   };
 
-  // custom function: validPassword(password)
-  // check and instance of the model (specific user) against the typed password
-  // use bcrypt to compare hashes. This is for signin password validation.
   customer.prototype.validPassword = function (typedPwd) {
     return bcrypt.compareSync(typedPwd, this.password);
   }
