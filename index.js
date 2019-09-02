@@ -68,9 +68,10 @@ app.get('/', (req, res) => {
 app.use('/auth', require('./controllers/auth'));
 app.use('/preferences', require('./controllers/preferences'));
 app.use('/routes', require('./controllers/routes'));
+app.use('/plans', require('./controllers/plans'));
 
 app.get('*', (req, res) => {
-  res.send(`I dunno. 404 or something?`);
+  res.sendfile('views/error/custom_error.html');
 })
 
 ////////////////////////////////////////////////

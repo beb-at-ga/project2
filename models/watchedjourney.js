@@ -8,7 +8,10 @@ module.exports = (sequelize, DataTypes) => {
     TerminalDescription: DataTypes.STRING,
     DayOpDescription: DataTypes.STRING,
     Time: DataTypes.STRING,
-    VesselName: DataTypes.STRING
+    VesselName: DataTypes.STRING,
+    Description: DataTypes.STRING,
+    RouteID: DataTypes.INTEGER,
+    TerminalID: DataTypes.INTEGER
   }, {});
   watchedJourney.associate = function (models) {
 

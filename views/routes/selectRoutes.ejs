@@ -1,28 +1,48 @@
-<h1>Hello routes.</h1>
+<h3>Hello, Routes.</h3>
+<h6>Find your favorite routes, click it to add to your watch list.</h6>
 
-<hr />
-<div style="width:100%">
+<div class="input-field col s12">
+  <select id="weekPart" name="weekPart">
+    <option value="All" selected>All Schedules</option>
+    <option value="Daily">Daily Schedules</option>
+    <option value="Monday through Friday">Monday through Friday Schedules</option>
+    <option value="Sunday">Saturday, Sunday, and Holidays Schedules</option>
+  </select>
+</div>
+
+ <div style="width:100%">
   <table id="sailings" class="display" style="width:100%">
     <thead>
       <tr>
-        <th>ScheduleID</th>
-        <th>SchedRouteID</th>
-        <th>JourneyID</th>
+        <th>Route</th>
         <th>Departing Terminal</th>
         <th>Days of Week</th>
         <th>Departure Time</th>
-        <th>VesselName</th>=
+        <th>Vessel Name</th>
+        <th>ScheduleID</th>
+        <th>SchedRouteID</th>
+        <th>JourneyID</th>
+        <th>RouteID</th>
+        <th>TerminalID</th>
       </tr>
     </thead>
     <tbody>
-        <select id="weekPart" name="weekPart">
-            <option value="All" selected>All Weekly Schedules</option>
-            <option value="Daily">Daily Schedules</option>
-            <option value="Monday through Friday">Monday through Friday Schedules</option>
-            <option value="Sunday">Saturday, Sunday, and Holidays Schedules</option>
-        </select>
+
     </tbody>
-    <tfoot></tfoot>
+    <tfoot>      
+      <tr>
+        <th>Route</th>
+        <th>Departing Terminal</th>
+        <th>Days of Week</th>
+        <th>Departure Time</th>
+        <th>Vessel Name</th>
+        <th>ScheduleID</th>
+        <th>SchedRouteID</th>
+        <th>JourneyID</th>
+        <th>RouteID</th>
+        <th>TerminalID</th>
+      </tr>
+    </tfoot>
   </table>
 </div>
 
@@ -33,13 +53,16 @@
       <% s.Journs.forEach(j => { %>
         <% j.TerminalTimes.forEach(t => { %>
           [
-            '<%= s.ScheduleID %>', 
-            '<%= s.SchedRouteID %>', 
-            '<%= j.JourneyID %>',
+            '<%= s.Description %>',
             '<%= t.TerminalDescription %>',
             '<%= s.DayOpDescription %>',
             '<%= moment(t.Time).format("hh:mm A") %>',
             '<%= j.VesselName %>',
+            '<%= s.ScheduleID %>', 
+            '<%= s.SchedRouteID %>', 
+            '<%= j.JourneyID %>',
+            '<%= s.RouteID %>',      
+            '<%= t.TerminalID %>',           
           ],
         <% }) %>
       <% }) %>

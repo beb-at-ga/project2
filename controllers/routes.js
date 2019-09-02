@@ -6,7 +6,7 @@ const async = require('async');
 
 let today = moment(); // "2019-08-26T08:02:17-05:00"
 
-//first function in waterfall
+//first function in waterfall to get list of journeys
 let getCurrentSeason = function (done) {
   axios.get(`https://www.wsdot.wa.gov/Ferries/API/schedule/rest/activeseasons`, {
       params: {
@@ -24,9 +24,10 @@ let getCurrentSeason = function (done) {
       console.log(`~~~~~~ Axios Error in getCurrentSeason: ${err}`);
     })
 }
-//second function in waterfall
+//second function in waterfall to get list of journeys
 let getScheduledRoutes = function (firstRes, done) {
-  axios.get('http://www.wsdot.wa.gov/Ferries/API/Schedule/rest/schedroutes', {
+  let ScheduleID = firstRes; // just because it's easier to keep clear.
+  axios.get(`http://www.wsdot.wa.gov/Ferries/API/Schedule/rest/schedroutes/${ScheduleID}`, {
       params: {
         'apiaccesscode': process.env.WSDOT_API_KEY
       }
@@ -34,19 +35,25 @@ let getScheduledRoutes = function (firstRes, done) {
     .then(results => {
       let returnArr = [];
       results.data.forEach(r => {
-        if (r.ScheduleID === firstRes) {
-          returnArr.push(r.SchedRouteID);
-        }
+        let o = {}
+        o.SchedRouteID = r.SchedRouteID;
+        o.RouteID = r.RouteID;
+        o.Description = r.Description
+        returnArr.push(o);
       })
       done(null, returnArr);
     })
 }
-//third function in waterfall
+//third function in waterfall to get list of journeys
 let getAllSailings = function (secondRes, done) {
+
+  let routeSummary = secondRes;
+
+  // create and array of promises, then spray them all at once with axios.all.
   let subQueryPromises = [];
-  secondRes.forEach(e => {
+  routeSummary.forEach(e => {
     subQueryPromises.push(
-      axios.get(`http://www.wsdot.wa.gov/Ferries/API/Schedule/rest/sailings/${e}`, {
+      axios.get(`http://www.wsdot.wa.gov/Ferries/API/Schedule/rest/sailings/${e.SchedRouteID}`, {
         params: {
           'apiaccesscode': process.env.WSDOT_API_KEY
         }
@@ -56,40 +63,41 @@ let getAllSailings = function (secondRes, done) {
 
   let sailings = [];
   axios.all(subQueryPromises)
-    .then(summary => {
-      summary.forEach(s => {
-        sailings.push(s);
+    .then(sprayResults => {
+      // console.log(sprayResults[0].data[0].RouteID)
+      sprayResults.forEach(s => {
+        s.data.forEach(s2 => {
+          routeSummary.forEach(rs => {
+            // console.log(s2)
+            // console.log(`rs.RouteID is ${rs.RouteID}`)
+            if (s2.RouteID === rs.RouteID) {
+              s2.Description = rs.Description
+              sailings.push(s2);
+            }
+          })
+        })
       })
     })
     .then(() => {
+      // console.log(sailings);
       done(null, sailings);
     })
 }
-
-
+// Get a list of sailings (and journeys of sailings) to pick for watchedJourneys
 router.get('/', (req, res) => {
   async.waterfall([
     getCurrentSeason,
     getScheduledRoutes,
     getAllSailings
-  ], (err, results) => {
-    let sailings = [];
-    // console.log(results[0].data);
-    results.forEach(r => {
-      // console.log(r.data);
-      r.data.forEach(x => {
-        // console.log(x.SailingDescription);
-        sailings.push(x);
-      })
-    })
+  ], (err, waterfallResults) => {
     res.render('routes/selectRoutes', {
       moment: moment,
-      sailings
+      sailings: waterfallResults
     });
   })
 })
 
-
+// Add a favorite to watchedJourneys
 router.post('/', (req, res) => {
   db.customer.findByPk(res.locals.customer.id)
     .then((cust) => {
@@ -106,17 +114,18 @@ router.post('/', (req, res) => {
     })
 })
 
+// Delete a favorite from watchedJourneys
 router.delete(('/:JourneyID'), (req, res) => {
   db.watchedJourney.destroy({
-    where: {
-      customerId: res.locals.customer.id,
-      JourneyID: req.params.JourneyID
-    }
-  })
-  .then(() => {
-    res.json(req.body);
-  })
-  
+      where: {
+        customerId: res.locals.customer.id,
+        JourneyID: req.params.JourneyID
+      }
+    })
+    .then(() => {
+      res.json(req.body);
+    })
+
 })
 
 module.exports = router;
@@ -126,72 +135,3 @@ module.exports = router;
 
 
 
-
-// let GetScheduleDetails = function (details) {
-
-//   this.details = details;
-
-//   this.getSailings = function (done) {
-//     axios.get(`http://www.wsdot.wa.gov/Ferries/API/Schedule/rest/sailings/${details.scheduledRouteId}`, {
-//         params: {
-//           'apiaccesscode': process.env.WSDOT_API_KEY
-//         }
-//       })
-//       .then(response => {
-//         done(null, response.data)
-//       })
-//       .catch(err => {
-//         console.log(`~~~~~~ Axios Error in getSailings: ${err}`);
-//       })
-//   }
-// }
-
-// router.get('/:routeComboId/:departingTerminalId', (req, res) => {
-//   db.routeCombo.findOne({
-//       where: {
-//         id: req.params.routeComboId
-//       }
-//     })
-//     .then((routeCombo) => {
-
-//       let details = {
-//         scheduledRouteId: routeCombo.scheduledRouteId,
-//       }
-
-//       let getScheduleDetails = new GetScheduleDetails(details);
-
-//       async.series([
-//           getScheduleDetails.getSailings
-//         ])
-//         .then(results => {
-//           let fl = [];
-//           // routeCombo.departingTerminalId
-//           function search(ta) {
-//             ta.forEach(o => {
-//               o.Journs.forEach(j => {
-//                 j.TerminalTimes.forEach(t => {
-//                   if (t.TerminalID === routeCombo.departingTerminalId) {
-//                     fl.push(j);
-//                   }
-//                 })
-//               })
-//             })
-//           }
-
-//           search(results[0]);
-
-//           // filtered for  Journs.TerminalTimes[0].TerminalId === req.params.departingTerminalId
-//           // res.json(results[0]);
-//           // res.send(`${routeCombo.departingTerminalId}`);
-//           // res.json(fl);
-//           res.render('routes/index', {
-//             moment: moment,
-//             journs: fl,
-//             results: results[0]
-//           });
-//         })
-//     })
-//     .catch((err) => {
-//       console.log(`${err}`);
-//     })
-// })

@@ -25,7 +25,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     preferredrouteid: DataTypes.INTEGER,
     mobilephone: DataTypes.STRING,
-    preferredDepartingTerminalID: DataTypes.INTEGER
+    preferredDepartingTerminalID: DataTypes.INTEGER,
+    preferredTransportToTerminal: DataTypes.STRING
   }, {
     hooks: {
       beforeCreate: (pendingUser) => {

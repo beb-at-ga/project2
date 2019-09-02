@@ -1,81 +1,265 @@
-<% if (customer.firstname) { %>
-<h2>Hi, <%= customer.firstname %></h2>
-<% } else { %>
-<h2>Hi, <%= customer.email %></h2>
-<% } %>
+<div class="row">
+    <div class="col s3">
 
-<!-- <body onload="getLocation()"></body> -->
-<div>
-  <button onclick="getLocation()">Find Nearest</button>
-</div>
-<p id="location" />
-<hr />
+        <% if (customer.firstname) { %>
+          <h3>Hi, <%= customer.firstname %></h3>
+          <% } else { %>
+          <h3>Hi!</h3>
+          <% } %>
 
-<form method="POST" action="/preferences/update">
-  <label for="firstname">First Name</label>:
-  <input id="firstname" type="text" name="firstname" value="<%= customer.firstname %>" placeholder="First Name">
-  <button type="SUBMIT">Update Preferences</button>
-</form>
-<hr />
+          <form method="POST" action="/preferences/update">
+            <label for="firstname">First Name:</label>
+            <input id="firstname" type="text" name="firstname" value="<%= customer.firstname %>" placeholder="First Name">
 
-<h2>Watch List</h2>
-<h4>You will recieve update alerts for these routes.</h4>
-<button onclick="window.location.href='/routes'">Add Routes and Journeys to Your Alert List</button>
+            <label for="mobilephone">Mobile Phone:</label>
+            <input id="mobilephone" type="tel" name="mobilephone" value="<%= customer.mobilephone %>">
 
-<div style="width:100%">
-  <table id="watchedJourneys" class="display" style="width:100%">
-    <thead>
-      <tr>
-        <th>ScheduleID</th>
-        <th>SchedRouteID</th>
-        <th>JourneyID</th>
-        <th>Departing Terminal</th>
-        <th>Days of Week</th>
-        <th>Departure Time</th>
-        <th>VesselName</th>
-      </tr>
-    </thead>
-    <tbody>
+            <label for="preferredTransportToTerminal">How you get around?</label>
+              <select id="preferredTransportToTerminal" name="preferredTransportToTerminal">
+                <% if (customer.preferredTransportToTerminal === 'walking') { %>
+                  <option value="walking" selected>Walking</option>
+                  <option value="cycling">Cycling</option>
+                <% } else { %>
+                  <option value="walking">Walking</option>
+                  <option value="cycling" selected>Cycling</option>
+                <% } %>
+              </select>
+          
+            <button type="SUBMIT" class="waves-effect waves-light btn">Update Preferences</button>
+          </form>
+          
+    </div>
+    <div class="col s9">
+        <h3>Watch List</h3>
+        <h6>Someday, you will recieve update alerts for these routes.</h6>
+        <button onclick="window.location.href='/routes'" class="waves-effect waves-light btn">Add Routes and Journeys to Your Alert List</button>
+        
+        <div style="width:100%">
+          <table id="watchedJourneys" class="display" style="width:100%">
+            <thead>
+              <tr>
+                <th>ScheduleID</th>
+                <th>SchedRouteID</th>
+                <th>JourneyID</th>
+                <th>Departing Terminal</th>
+                <th>Days of Week</th>
+                <th>Departure Time</th>
+                <th>VesselName</th>
+                <th>Remove from List</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot></tfoot>
+          </table>
+        </div>
+        
+        <script>
+          let data = [
+            <% watchedJourneys.forEach(j => { %>
+              [
+                '<%= j.ScheduleID %>', 
+                '<%= j.SchedRouteID %>', 
+                '<%= j.JourneyID %>',
+                '<%= j.TerminalDescription %>',
+                '<%= j.DayOpDescription %>',
+                '<%= j.Time %>',
+                '<%= j.VesselName %>',
+                '<button class="waves-effect waves-light btn">Remove</button>'
+              ],
+            <% }) %>
+          ]
+        </script>
+        
+        <div id='map'></div>
+        
+    </div>
+  </div>
 
-    </tbody>
-    <tfoot></tfoot>
-  </table>
-</div>
 
 <script>
-  let data = [
-    <% watchedJourneys.forEach(j => { %>
-      [
-        '<%= j.ScheduleID %>', 
-        '<%= j.SchedRouteID %>', 
-        '<%= j.JourneyID %>',
-        '<%= j.TerminalDescription %>',
-        '<%= j.DayOpDescription %>',
-        '<%= j.Time %>',
-        '<%= j.VesselName %>'
-      ],
-    <% }) %>
-  ]
+let start;
+let geojson;
+
+mapboxgl.accessToken = '<%= process.env.MAPBOX_TOKEN %>';
+let map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/streets-v11',
+  center: [-122.3321, 47.6061],
+  zoom: 12
+});
+
+// Set up a control to obtain current coordinates.
+// the trigger on map load.
+let geoTracker = new mapboxgl.GeolocateControl({
+  positionOptions: {
+    enableHighAccuracy: true
+  },
+  trackUserLocation: true
+});
+
+
+geoTracker.on('geolocate', function(){
+
+  let userlocation = geoTracker._lastKnownPosition;
+  // console.log(`Current Locations = ${userlocation.coords.longitude} / ${userlocation.coords.latitude}`);
+
+  start = [userlocation.coords.longitude, userlocation.coords.latitude];
+
+  // Add starting point to the map
+  if (!map.getSource('point')) {
+    map.addLayer({
+      id: 'point',
+      type: 'circle',
+      source: {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: start
+            }
+          }]
+        }
+      },
+      paint: {
+        'circle-radius': 15,
+        'circle-color': '#0006FF'
+      }
+    });
+
+    // set the starting endpoint to the starting point
+    // yup, right on top of each other. then the route
+    // change will work without clicking twidce
+    setEnd(start)
+  }
+
+});
+
+map.addControl(geoTracker);
+let canvas = map.getCanvasContainer();
+
+// create a function to make a directions request
+function getRoute(end, mode) {
+  if (!mode) {mode = 'walking'};
+  let url = `https://api.mapbox.com/directions/v5/mapbox/${mode}/${start[0]},${start[1]};${end[0]},${end[1]}?geometries=geojson&access_token=${mapboxgl.accessToken}`;
+
+  let req = new XMLHttpRequest();
+  req.responseType = 'json';
+  req.open('GET', url, true);
+
+  req.onload = function() {
+    let data = req.response.routes[0];
+    let route = data.geometry.coordinates;
+    geojson = {
+      type: 'Feature',
+      properties: {},
+      geometry: {
+        type: 'LineString',
+        coordinates: route
+      }
+    };
+
+    // if the route already exists on the map, reset it using setData
+    if (map.getSource('route')) {
+      map.getSource('route').setData(geojson);
+      
+      let coordinates = geojson.geometry.coordinates;
+
+      let bounds = coordinates.reduce(function(bounds, coords) {
+        return bounds.extend(coords);
+      }, new mapboxgl.LngLatBounds(coordinates[0], coordinates[0]));
+
+      map.fitBounds(bounds, {
+        padding: 20
+      });   
+    } else { // otherwise, make a new request
+      map.addLayer({
+        id: 'route',
+        type: 'line',
+        source: {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'LineString',
+              coordinates: geojson
+            }
+          }
+        },
+        layout: {
+          'line-join': 'round',
+          'line-cap': 'round'
+        },
+        paint: {
+          'line-color': '#FF0085',
+          'line-width': 5,
+          'line-opacity': 1.0
+        }
+      });
+    }
+  };
+  req.send();
+}
+
+
+// Still non-functional as of Monday
+function zoomToRoute() {
+ 
+}
+
+
+function setEnd(coord, mode) {
+  if (map.getLayer('end')) {
+    let end = {
+      type: 'FeatureCollection',
+        features: [{
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: coord
+          }
+        }]
+    };
+    map.getSource('end').setData(end);
+  } else {
+    map.addLayer({
+      id: 'end',
+      type: 'circle',
+      source: {
+        type: 'geojson',
+        data: {
+          type: 'FeatureCollection',
+          features: [{
+            type: 'Feature',
+            properties: {},
+            geometry: {
+              type: 'Point',
+              coordinates: coord
+            }
+          }]
+        }
+      },
+      paint: {
+        'circle-radius': 10,
+        'circle-color': '#00FF7A'
+      }
+    });
+  }
+  getRoute(coord, mode);
+}
+
+map.on('load', function() {
+  geoTracker.trigger();
+});
+
+
+
 </script>
 
 
-
-<!-- 
-<div id='map'></div>
-<script>
-  mapboxgl.accessToken = 'pk.eyJ1IjoiYmViLSIsImEiOiJjanpsbGpuZjMwd2ttM2JrNmtyNTVldGM0In0.Tmu9yv3-2cWJFxiq87xFPQ';
-  var map = new mapboxgl.Map({
-    container: 'map', // container id
-    style: 'mapbox://styles/mapbox/streets-v11',
-    center: [-96, 37.8], // starting position
-    zoom: 3 // starting zoom
-  });
-
-  // Add geolocate control to the map.
-  map.addControl(new mapboxgl.GeolocateControl({
-    positionOptions: {
-      enableHighAccuracy: true
-    },
-    trackUserLocation: true
-  }));
-</script> -->
