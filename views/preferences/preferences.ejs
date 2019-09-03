@@ -7,7 +7,7 @@
           <h3>Hi!</h3>
           <% } %>
 
-          <form method="POST" action="/preferences/update">
+          <form method="POST" action="/preferences?_method=PUT">
             <label for="firstname">First Name:</label>
             <input id="firstname" type="text" name="firstname" value="<%= customer.firstname %>" placeholder="First Name">
 
@@ -24,7 +24,7 @@
                   <option value="cycling" selected>Cycling</option>
                 <% } %>
               </select>
-          
+              
             <button type="SUBMIT" class="waves-effect waves-light btn">Update Preferences</button>
           </form>
           

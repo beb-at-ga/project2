@@ -71,7 +71,7 @@ app.use('/routes', require('./controllers/routes'));
 app.use('/plans', require('./controllers/plans'));
 
 app.get('*', (req, res) => {
-  res.sendfile('views/error/custom_error.html');
+  res.sendFile('views/error/custom_error.html');
 })
 
 ////////////////////////////////////////////////

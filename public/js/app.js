@@ -145,7 +145,7 @@ if (typeof data !== 'undefined') {
             type: 'POST',
             data: JSON.stringify(postBody),
             contentType: 'application/json',
-            url: `http://localhost:3000/routes/${rowData[2]}?_method=DELETE`,
+            url: `/routes/${rowData[2]}?_method=DELETE`,
             success: function (postResponse) {
               console.log('success');
               console.log(JSON.stringify(postResponse));
@@ -170,7 +170,7 @@ if (typeof data !== 'undefined') {
           type: 'POST',
           data: JSON.stringify(postBody),
           contentType: 'application/json',
-          url: `http://localhost:3000/plans`,
+          url: `/plans`,
           success: function (postResponse) {
             setEnd(postResponse, mode);
           }

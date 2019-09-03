@@ -47,7 +47,7 @@ router.get('/', (req, res) => {
 })
 
 
-router.post('/update', (req, res) => {
+router.put('/', (req, res) => {
   db.customer.update({
       firstname: req.body.firstname,
       preferredTransportToTerminal: req.body.preferredTransportToTerminal,

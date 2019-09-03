@@ -5,10 +5,11 @@
 ~~- Include sign up/log in functionality, with hashed passwords & an authorization flow~~
 ~~- Incorporate at least one API. Examples include Yelp, Tumblr, Facebook, and others on Mashape.~~
 ~~- Have complete RESTful routes for at least one of your resources with GET, POST, PUT, and DELETE~~
+  ~~- GET on many, POST on several, DELETE on one, PUT on one.~~
 ~~- Utilize an ORM to create a database table structure and interact with your relationally-stored data~~
-- Include a readme file that explains how to use your app
-- Have semantically clean HTML, CSS, and back-end code
-- Be deployed online and accessible to the public
+~~- Include a readme file that explains how to use your app~~
+~~- Have semantically clean HTML, CSS, and back-end code~~
+~~- Be deployed online and accessible to the public~~
 
 ## Necessary Deliverables:
 - A working full-stack application, built by you, hosted somewhere on the internet
